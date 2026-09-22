@@ -7,3 +7,7 @@ __pycache__/
 
 # API keys — never commit these
 .env
+
+# Marketing drafts — kept locally, not published with the code
+linkedin*
+*_post.md
