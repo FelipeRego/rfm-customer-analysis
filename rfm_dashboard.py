@@ -9,15 +9,30 @@ import numpy as np
 INPUT_FILE   = 'rfm_analysis.csv'
 DASHBOARD_FILE = 'rfm_dashboard.png'
 
+# All 11 segments the model can assign, not just the ones a given dataset happens
+# to contain. Indexing this dict directly used to raise KeyError the moment real
+# data produced a segment that the sample data never did.
 SEGMENT_STYLES = {
     'Champions':          {'color': '#0072B2', 'marker': 'o'},
     'Loyal':              {'color': '#009E73', 'marker': 's'},
     'Potential Loyalist': {'color': '#E69F00', 'marker': '^'},
     'Promising':          {'color': '#56B4E9', 'marker': 'D'},
+    'New Customer':       {'color': '#D55E00', 'marker': '*'},
+    'Need Attention':     {'color': '#8C6D00', 'marker': 'v'},
+    'About to Sleep':     {'color': '#7B6FB0', 'marker': '<'},
+    'At Risk':            {'color': '#B22222', 'marker': '>'},
+    "Can't Lose Them":    {'color': '#005F73', 'marker': 'h'},
     'Hibernating':        {'color': '#CC79A7', 'marker': 'P'},
     'Lost':               {'color': '#999999', 'marker': 'X'},
-    'New Customer':       {'color': '#D55E00', 'marker': '*'},
 }
+
+# Last-resort fallback so an unrecognised label degrades to a grey dot rather than
+# taking the whole chart run down.
+DEFAULT_STYLE = {'color': '#7F7F7F', 'marker': 'o'}
+
+
+def style_for(seg):
+    return SEGMENT_STYLES.get(seg, DEFAULT_STYLE)
 
 BG          = '#FFFFFF'
 SPINE_COLOR = '#CCCCCC'
@@ -63,7 +78,7 @@ seg_summary = df.groupby('segment').agg(
     count=('customerid', 'count'), avg_clv=('clv', 'mean')
 ).reindex(reversed(segment_order))
 y         = np.arange(len(seg_summary))
-colors    = [SEGMENT_STYLES[s]['color'] for s in reversed(segment_order)]
+colors    = [style_for(s)['color'] for s in reversed(segment_order)]
 max_count = seg_summary['count'].max()
 
 ax.barh(y, seg_summary['count'], color=colors, edgecolor='none', height=0.55)
@@ -115,7 +130,7 @@ save(fig, 'rfm_chart_2_heatmap.png')
 fig, ax = plt.subplots(figsize=(9, 6))
 for seg in segment_order:
     sub   = df[df['segment'] == seg]
-    style = SEGMENT_STYLES[seg]
+    style = style_for(seg)
     ax.scatter(sub['recency'], sub['monetaryValue'],
                color=style['color'], marker=style['marker'],
                alpha=0.85, edgecolors='white', linewidth=0.4,
@@ -126,8 +141,8 @@ ax.set_title('Recency vs Monetary Value', fontsize=13, fontweight='bold',
              color=TEXT_DARK, pad=12, loc='left')
 ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f'${v:,.0f}'))
 handles = [
-    mlines.Line2D([], [], color=SEGMENT_STYLES[s]['color'],
-                  marker=SEGMENT_STYLES[s]['marker'], linestyle='None',
+    mlines.Line2D([], [], color=style_for(s)['color'],
+                  marker=style_for(s)['marker'], linestyle='None',
                   markersize=8, label=s)
     for s in segment_order
 ]
@@ -139,7 +154,7 @@ save(fig, 'rfm_chart_3_scatter.png')
 # ── 4. BOX PLOT ───────────────────────────────────────────────────────────────
 fig, ax = plt.subplots(figsize=(9, 6))
 df['seg_cat'] = pd.Categorical(df['segment'], categories=segment_order, ordered=True)
-palette = {s: SEGMENT_STYLES[s]['color'] for s in segment_order}
+palette = {s: style_for(s)['color'] for s in segment_order}
 sns.boxplot(data=df.sort_values('seg_cat'), x='seg_cat', y='clv', ax=ax,
             hue='seg_cat', palette=palette, order=segment_order,
             legend=False, linewidth=1.2, width=0.55,
