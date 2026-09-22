@@ -1,0 +1,101 @@
+customerid,segment,clv,value,behavioural_risk,stated_risk,priority,driver,churn_intent,recoverable,needs_human,blind_spot,route
+CUSKEYZ7,Lost,154.43,0.082,1.0,0.946,0.7,circumstance,0.98,0.14,0.45,no,campaign
+CUSZE5R5,Lost,127.07,0.068,1.0,0.948,0.697,circumstance,0.98,0.13,0.56,no,campaign
+CUSOTOHP,Lost,156.62,0.084,1.0,0.926,0.692,none,0.96,0.14,0.31,no,campaign
+CUSF877V,Lost,128.49,0.069,1.0,0.924,0.686,none,0.96,0.15,0.26,no,campaign
+CUS4GH2M,Lost,142.54,0.076,1.0,0.883,0.67,price,0.97,0.36,0.33,no,campaign
+CUSGXN0G,Lost,128.72,0.069,1.0,0.679,0.576,competitor,0.82,0.69,0.72,no,human
+CUS8G8JD,Lost,158.03,0.084,1.0,0.662,0.573,price,0.79,0.65,0.6,no,campaign
+CUSITFOY,Lost,147.36,0.079,1.0,0.664,0.573,circumstance,0.82,0.76,0.31,no,campaign
+CUSJ2QP8,Lost,149.04,0.08,1.0,0.656,0.569,price,0.8,0.72,0.54,no,campaign
+CUS5Q14J,Lost,147.41,0.079,1.0,0.65,0.566,price,0.79,0.71,0.53,no,campaign
+CUS6SYLZ,Lost,122.82,0.066,1.0,0.658,0.566,circumstance,0.81,0.75,0.31,no,campaign
+CUSGVYIE,Lost,126.05,0.067,1.0,0.652,0.564,price,0.79,0.7,0.68,no,human
+CUSPTK93,Lost,121.23,0.065,1.0,0.647,0.561,price,0.78,0.68,0.67,no,human
+CUS5907I,Loyal,1050.72,0.561,0.2,0.738,0.55,service,0.44,0.7,0.86,yes,human
+CUS5USGI,Hibernating,173.04,0.092,0.85,0.666,0.54,price,0.8,0.67,0.62,no,human
+CUSKQ1UY,Potential Loyalist,546.89,0.292,0.45,0.738,0.532,service,0.25,0.72,0.88,no,human
+CUSM5IGQ,Potential Loyalist,524.33,0.28,0.45,0.729,0.525,service,0.13,0.75,0.87,no,human
+CUSCIYHE,Lost,141.64,0.076,1.0,0.559,0.524,competitor,0.69,0.76,0.59,no,campaign
+CUS65KXV,Potential Loyalist,652.33,0.348,0.3,0.731,0.508,service,0.23,0.75,0.91,yes,human
+CUSKOIXN,Loyal,742.52,0.396,0.35,0.632,0.491,service,0.13,0.71,0.87,yes,human
+CUSCRUYF,Loyal,761.83,0.406,0.2,0.68,0.478,competitor,0.81,0.64,0.8,yes,human
+CUSOR56F,New Customer,294.16,0.157,0.4,0.733,0.477,service,0.28,0.74,0.89,yes,human
+CUSXDP5G,Hibernating,204.3,0.109,0.85,0.503,0.472,product,0.45,0.71,0.54,no,campaign
+CUSYT7D5,Hibernating,183.36,0.098,0.85,0.508,0.471,price,0.37,0.63,0.58,no,campaign
+CUSH75LX,Hibernating,200.41,0.107,0.85,0.501,0.47,price,0.38,0.66,0.59,no,campaign
+CUS9TMQL,Champions,1516.59,0.809,0.0,0.5,0.468,service,0.13,0.78,0.78,no,human
+CUSO64T0,Need Attention,551.87,0.294,0.6,0.497,0.462,price,0.4,0.67,0.45,no,campaign
+CUSFGSXW,Need Attention,513.69,0.274,0.6,0.503,0.459,price,0.47,0.76,0.71,no,human
+CUSEQTUL,Need Attention,546.22,0.291,0.6,0.487,0.456,price,0.32,0.75,0.39,no,campaign
+CUSWD14V,Promising,286.7,0.153,0.7,0.508,0.45,price,0.43,0.61,0.39,no,campaign
+CUSRP0J4,Need Attention,504.05,0.269,0.6,0.484,0.449,price,0.33,0.76,0.4,no,campaign
+CUSUOVW1,Hibernating,177.32,0.095,0.85,0.461,0.448,product,0.12,0.78,0.45,no,campaign
+CUSX8FSV,Promising,262.73,0.14,0.7,0.504,0.444,price,0.39,0.62,0.41,no,campaign
+CUSXO9T7,Promising,295.81,0.158,0.7,0.491,0.443,price,0.43,0.76,0.62,no,human
+CUSZ41NA,Potential Loyalist,598.57,0.319,0.45,0.514,0.44,product,0.49,0.64,0.48,no,campaign
+CUSFAZZ8,Promising,239.74,0.128,0.7,0.502,0.439,product,0.51,0.7,0.36,no,campaign
+CUS60FKH,Hibernating,170.34,0.091,0.85,0.434,0.435,product,0.15,0.75,0.51,no,campaign
+CUS8BBI4,Promising,225.26,0.12,0.7,0.491,0.432,price,0.43,0.76,0.62,no,human
+CUSR23GD,Lost,159.36,0.085,1.0,0.348,0.432,competitor,0.41,0.6,0.49,no,campaign
+CUSV1V93,Hibernating,183.59,0.098,0.85,0.416,0.429,product,0.14,0.72,0.4,no,campaign
+CUSXA11D,Hibernating,152.76,0.081,0.85,0.424,0.428,product,0.17,0.77,0.36,no,campaign
+CUSXTAD1,Promising,194.47,0.104,0.7,0.486,0.425,price,0.46,0.71,0.62,no,human
+CUSE511M,Hibernating,198.92,0.106,0.85,0.384,0.417,product,0.06,0.72,0.54,no,campaign
+CUSBPS3Y,Promising,222.35,0.119,0.7,0.451,0.414,product,0.13,0.8,0.44,no,campaign
+CUS8D1WJ,New Customer,241.37,0.129,0.55,0.514,0.408,product,0.48,0.66,0.54,no,campaign
+CUS6QICA,Lost,127.88,0.068,1.0,0.285,0.399,none,0.3,0.2,0.19,no,campaign
+CUS63CFL,Lost,158.76,0.085,1.0,0.263,0.394,none,0.28,0.24,0.21,no,campaign
+CUSBQH7M,Promising,201.76,0.108,0.7,0.413,0.393,product,0.14,0.74,0.42,no,campaign
+CUS3FB9W,New Customer,273.01,0.146,0.55,0.467,0.391,product,0.12,0.81,0.5,no,campaign
+CUSWZS3T,Promising,267.02,0.142,0.7,0.386,0.391,product,0.06,0.72,0.54,no,campaign
+CUSQ0B8I,New Customer,306.33,0.163,0.55,0.431,0.38,product,0.15,0.72,0.46,no,campaign
+CUSVAZCC,Potential Loyalist,686.04,0.366,0.3,0.429,0.378,product,0.15,0.77,0.47,no,campaign
+CUS8DRC1,Need Attention,446.22,0.238,0.6,0.347,0.378,product,0.05,0.76,0.72,no,human
+CUSW3BME,Potential Loyalist,602.67,0.321,0.3,0.458,0.377,product,0.12,0.8,0.44,no,campaign
+CUSTIRZQ,New Customer,257.19,0.137,0.4,0.521,0.376,service,0.17,0.69,0.72,no,human
+CUSFQEWA,Potential Loyalist,601.21,0.321,0.45,0.368,0.374,product,0.05,0.75,0.65,no,human
+CUSMKZEB,Potential Loyalist,642.19,0.343,0.3,0.429,0.371,product,0.15,0.77,0.47,no,campaign
+CUSY4SJ6,New Customer,244.82,0.131,0.55,0.426,0.369,product,0.15,0.79,0.47,no,campaign
+CUSQ5C34,Promising,225.19,0.12,0.7,0.344,0.366,product,0.05,0.77,0.68,no,human
+CUS6KVPU,New Customer,293.84,0.157,0.55,0.378,0.355,product,0.05,0.75,0.66,no,human
+CUSHR62G,New Customer,252.05,0.134,0.55,0.352,0.336,product,0.05,0.76,0.71,no,human
+CUS08YG0,Hibernating,225.11,0.12,0.85,0.194,0.336,price,0.17,0.8,0.77,no,human
+CUS43D8W,Lost,173.11,0.092,1.0,0.104,0.324,circumstance,0.09,0.76,0.26,no,campaign
+CUS8Z2FL,Lost,113.65,0.061,1.0,0.098,0.312,circumstance,0.12,0.75,0.15,no,campaign
+CUSWJCKJ,Hibernating,223.55,0.119,0.85,0.139,0.311,product,0.09,0.76,0.25,no,campaign
+CUSBMYYM,Lost,159.21,0.085,1.0,0.073,0.308,none,0.09,0.74,0.14,no,campaign
+CUSO4KH2,Champions,1874.58,1.0,0.0,0.015,0.307,none,0.02,0.92,0.21,no,campaign
+CUSBNTPB,Champions,1740.42,0.928,0.0,0.028,0.291,none,0.03,0.27,0.27,no,campaign
+CUSPZUE8,Promising,253.22,0.135,0.7,0.162,0.288,product,0.09,0.77,0.24,no,campaign
+CUSSEMCI,Hibernating,181.53,0.097,0.85,0.089,0.282,none,0.11,0.75,0.15,no,campaign
+CUSOWGZR,Promising,191.38,0.102,0.7,0.158,0.277,product,0.1,0.71,0.25,no,campaign
+CUSY0IFZ,Hibernating,203.55,0.109,0.85,0.041,0.264,none,0.05,0.71,0.32,no,campaign
+CUSHHPBM,Hibernating,187.87,0.1,0.85,0.048,0.264,circumstance,0.06,0.82,0.19,no,campaign
+CUSHZIOY,Hibernating,198.96,0.106,0.85,0.041,0.263,none,0.05,0.75,0.29,no,campaign
+CUST0HL9,Hibernating,178.04,0.095,0.85,0.048,0.263,none,0.06,0.78,0.27,no,campaign
+CUS6QJIU,Hibernating,231.22,0.123,0.85,0.017,0.257,none,0.02,0.69,0.4,no,campaign
+CUSAGL58,Hibernating,197.04,0.105,0.85,0.017,0.252,none,0.02,0.63,0.49,no,campaign
+CUSGOG72,Hibernating,191.08,0.102,0.85,0.017,0.251,none,0.02,0.66,0.41,no,campaign
+CUSSWM31,Hibernating,179.83,0.096,0.85,0.017,0.249,none,0.02,0.67,0.58,no,campaign
+CUS7U6N7,Champions,1330.59,0.71,0.1,0.016,0.245,none,0.02,0.77,0.12,no,campaign
+CUSJ2V2H,Champions,1295.51,0.691,0.1,0.024,0.243,none,0.03,0.74,0.24,no,campaign
+CUSG8SBI,Promising,254.94,0.136,0.7,0.049,0.238,none,0.06,0.74,0.26,no,campaign
+CUSV6OH9,Loyal,761.79,0.406,0.35,0.04,0.227,none,0.05,0.77,0.29,no,campaign
+CUSP87WX,Promising,278.38,0.149,0.7,0.017,0.227,none,0.02,0.69,0.42,no,campaign
+CUSBKK4C,Promising,254.63,0.136,0.7,0.025,0.227,none,0.03,0.61,0.27,no,campaign
+CUSLQM5K,Loyal,783.72,0.418,0.35,0.025,0.224,none,0.03,0.66,0.14,no,campaign
+CUS92MPN,Loyal,734.29,0.392,0.35,0.041,0.224,none,0.05,0.74,0.38,no,campaign
+CUSUBCXU,Potential Loyalist,622.02,0.332,0.45,0.017,0.22,none,0.02,0.69,0.14,no,campaign
+CUSZFK8U,Champions,1078.65,0.575,0.1,0.047,0.219,none,0.05,0.27,0.35,no,campaign
+CUSQPGB7,Potential Loyalist,561.66,0.3,0.45,0.025,0.214,none,0.03,0.64,0.36,no,campaign
+CUSBR7TC,Potential Loyalist,554.77,0.296,0.45,0.025,0.213,none,0.03,0.64,0.16,no,campaign
+CUSN9T84,Potential Loyalist,716.38,0.382,0.3,0.041,0.208,none,0.05,0.73,0.34,no,campaign
+CUSPQ0Y9,Loyal,930.6,0.496,0.2,0.016,0.206,none,0.02,0.8,0.26,no,campaign
+CUSEYUHZ,Champions,1046.1,0.558,0.1,0.016,0.2,none,0.02,0.84,0.12,no,campaign
+CUSEN93I,Potential Loyalist,666.3,0.355,0.3,0.041,0.2,none,0.05,0.74,0.21,no,campaign
+CUSL1CQ9,Loyal,889.17,0.474,0.2,0.016,0.199,none,0.02,0.81,0.12,no,campaign
+CUS0LVSN,Potential Loyalist,496.23,0.265,0.45,0.016,0.199,none,0.02,0.75,0.17,no,campaign
+CUSTEIYZ,New Customer,272.91,0.146,0.55,0.017,0.189,none,0.02,0.68,0.35,no,campaign
+CUSBDW2P,New Customer,269.82,0.144,0.55,0.016,0.188,none,0.02,0.86,0.11,no,campaign
+CUSRCBPL,Potential Loyalist,519.97,0.277,0.3,0.041,0.177,none,0.05,0.71,0.32,no,campaign

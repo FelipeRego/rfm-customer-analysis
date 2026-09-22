@@ -1,0 +1,101 @@
+customerid,segment,channel,days_ago,verbatim,pool,contradicts_rfm
+CUSJ2V2H,Champions,account note,4,Is there a way to get a consolidated statement for the financial year?,admin,no
+CUS9TMQL,Champions,support ticket,3,Promised delivery date came and went with no notification. I had to find out from my own team that it hadn't arrived. Not good enough.,service_failure,yes
+CUSO4KH2,Champions,email to rep,2,The new range is exactly what I was after. Already planning the next order.,happy,no
+CUS7U6N7,Champions,support ticket,18,No issues at all — just renewing. Same as last time please.,happy,no
+CUSBNTPB,Champions,survey response,10,We've standardised on you for the whole office now. Easy decision.,happy,no
+CUSN9T84,Potential Loyalist,email to rep,21,Quick one — what's the current lead time on bulk orders?,admin,no
+CUSPQ0Y9,Loyal,support ticket,8,Been recommending you to everyone who'll listen. Keep doing what you're doing.,happy,no
+CUSL1CQ9,Loyal,survey response,5,Honestly the most painless supplier we deal with. Long may it continue.,happy,no
+CUSVAZCC,Potential Loyalist,support ticket,12,The product's fine but the online ordering experience is painful. Takes me ten minutes to do something that should take two.,product_gap,no
+CUSMKZEB,Potential Loyalist,support ticket,12,The product's fine but the online ordering experience is painful. Takes me ten minutes to do something that should take two.,product_gap,no
+CUS5907I,Loyal,survey response,13,I've asked twice for a callback from a manager. Still nothing. That tells me everything I need to know about where I sit as a customer.,service_failure,yes
+CUSZFK8U,Champions,support ticket,41,We've standardised on you for the whole office now. Easy decision.,happy,no
+CUS65KXV,Potential Loyalist,account note,23,"This is the fourth time I've had to chase this. Nobody calls back, nobody emails, and I'm still waiting on a resolution three weeks later. I've been a customer for years and this is how it goes.",service_failure,yes
+CUSCRUYF,Loyal,account note,53,We've been trialling another supplier alongside you for the last two months. Their turnaround has been faster.,competitor,yes
+CUSEYUHZ,Champions,account note,1,No issues at all — just renewing. Same as last time please.,happy,no
+CUSEN93I,Potential Loyalist,survey response,6,Quick one — what's the current lead time on bulk orders?,admin,no
+CUSOR56F,New Customer,survey response,25,"This is the fourth time I've had to chase this. Nobody calls back, nobody emails, and I'm still waiting on a resolution three weeks later. I've been a customer for years and this is how it goes.",service_failure,yes
+CUSRCBPL,Potential Loyalist,support ticket,40,Need to change the card on file before the next order goes through.,admin,no
+CUSW3BME,Potential Loyalist,support ticket,23,Quality's been inconsistent across the last two batches. Not a dealbreaker yet but worth flagging.,product_gap,no
+CUSTIRZQ,New Customer,survey response,35,Promised delivery date came and went with no notification. I had to find out from my own team that it hadn't arrived. Not good enough.,service_failure,yes
+CUSUBCXU,Potential Loyalist,support ticket,56,No issues at all — just renewing. Same as last time please.,happy,no
+CUSLQM5K,Loyal,support ticket,65,Honestly the most painless supplier we deal with. Long may it continue.,happy,no
+CUSKQ1UY,Potential Loyalist,survey response,57,"This is the fourth time I've had to chase this. Nobody calls back, nobody emails, and I'm still waiting on a resolution three weeks later. I've been a customer for years and this is how it goes.",service_failure,yes
+CUSZ41NA,Potential Loyalist,support ticket,55,"Missing the one SKU we order most. Had to go elsewhere for it, which rather defeats the purpose.",product_gap,no
+CUSFQEWA,Potential Loyalist,support ticket,42,We need integration with our inventory system. Without it we're doing double entry every week.,product_gap,no
+CUSM5IGQ,Potential Loyalist,email to rep,58,The refund was supposed to be processed a month ago. I'm still out of pocket and still chasing. Losing patience fast.,service_failure,yes
+CUS92MPN,Loyal,email to rep,31,Need to change the card on file before the next order goes through.,admin,no
+CUSV6OH9,Loyal,account note,3,Quick one — what's the current lead time on bulk orders?,admin,no
+CUSY4SJ6,New Customer,support ticket,7,The product's fine but the online ordering experience is painful. Takes me ten minutes to do something that should take two.,product_gap,no
+CUSKOIXN,Loyal,account note,30,Three separate people have given me three different answers. At this point I just want someone to own it.,service_failure,yes
+CUS6KVPU,New Customer,support ticket,49,We need integration with our inventory system. Without it we're doing double entry every week.,product_gap,no
+CUSQPGB7,Potential Loyalist,email to rep,90,Can I add a second user to the account so my colleague can order directly?,admin,no
+CUSBDW2P,New Customer,survey response,17,The new range is exactly what I was after. Already planning the next order.,happy,no
+CUSTEIYZ,New Customer,account note,71,Been recommending you to everyone who'll listen. Keep doing what you're doing.,happy,no
+CUSBR7TC,Potential Loyalist,email to rep,33,Just wanted to say the team sorted my delivery question in about four minutes. Refreshing.,happy,no
+CUSQ0B8I,New Customer,support ticket,55,The product's fine but the online ordering experience is painful. Takes me ten minutes to do something that should take two.,product_gap,no
+CUS3FB9W,New Customer,account note,26,Quality's been inconsistent across the last two batches. Not a dealbreaker yet but worth flagging.,product_gap,no
+CUS8D1WJ,New Customer,account note,80,"Missing the one SKU we order most. Had to go elsewhere for it, which rather defeats the purpose.",product_gap,no
+CUS0LVSN,Potential Loyalist,account note,87,The new range is exactly what I was after. Already planning the next order.,happy,no
+CUSHR62G,New Customer,account note,35,We need integration with our inventory system. Without it we're doing double entry every week.,product_gap,no
+CUSQ5C34,Promising,account note,48,We need integration with our inventory system. Without it we're doing double entry every week.,product_gap,no
+CUSXO9T7,Promising,survey response,58,We're getting quoted noticeably less elsewhere for the same spec. What can you do?,price,no
+CUSWD14V,Promising,survey response,51,The price increase landed without much warning. Hard to justify internally at that level.,price,no
+CUSG8SBI,Promising,survey response,69,Need to change the card on file before the next order goes through.,admin,no
+CUSP87WX,Promising,account note,63,Can you update the delivery address on my account? Moved offices last month.,admin,no
+CUSEQTUL,Need Attention,support ticket,60,"Love the product, but the freight charges are getting difficult to absorb.",price,no
+CUS8DRC1,Need Attention,account note,37,We need integration with our inventory system. Without it we're doing double entry every week.,product_gap,no
+CUSO64T0,Need Attention,survey response,4,The price increase landed without much warning. Hard to justify internally at that level.,price,no
+CUSPZUE8,Promising,survey response,24,Do you have anything in a larger format? The current size doesn't quite work for our use case.,product_gap,no
+CUSRP0J4,Need Attention,support ticket,37,"Love the product, but the freight charges are getting difficult to absorb.",price,no
+CUS8BBI4,Promising,survey response,58,We're getting quoted noticeably less elsewhere for the same spec. What can you do?,price,no
+CUSWZS3T,Promising,survey response,85,We need integration with our inventory system. Without it we're doing double entry every week.,product_gap,no
+CUSFGSXW,Need Attention,email to rep,58,We're getting quoted noticeably less elsewhere for the same spec. What can you do?,price,no
+CUSFAZZ8,Promising,survey response,59,"Missing the one SKU we order most. Had to go elsewhere for it, which rather defeats the purpose.",product_gap,no
+CUSBPS3Y,Promising,support ticket,35,Quality's been inconsistent across the last two batches. Not a dealbreaker yet but worth flagging.,product_gap,no
+CUSX8FSV,Promising,survey response,31,The price increase landed without much warning. Hard to justify internally at that level.,price,no
+CUSBQH7M,Promising,account note,47,The product's fine but the online ordering experience is painful. Takes me ten minutes to do something that should take two.,product_gap,no
+CUSBKK4C,Promising,email to rep,70,Is there a way to get a consolidated statement for the financial year?,admin,no
+CUSXTAD1,Promising,support ticket,83,We're getting quoted noticeably less elsewhere for the same spec. What can you do?,price,no
+CUSOWGZR,Promising,email to rep,39,Do you have anything in a larger format? The current size doesn't quite work for our use case.,product_gap,no
+CUSXDP5G,Hibernating,account note,44,"Missing the one SKU we order most. Had to go elsewhere for it, which rather defeats the purpose.",product_gap,no
+CUS6QJIU,Hibernating,survey response,88,Can you update the delivery address on my account? Moved offices last month.,admin,no
+CUSYT7D5,Hibernating,email to rep,82,The price increase landed without much warning. Hard to justify internally at that level.,price,no
+CUS08YG0,Hibernating,support ticket,48,Renewal came through 18% higher. Can we talk about that before I sign anything?,price,no
+CUSAGL58,Hibernating,support ticket,84,Do you have a copy of the invoice for order 4471? Finance needs it for reconciliation.,admin,no
+CUSSEMCI,Hibernating,email to rep,39,Still here! Just haven't had the need. Send me the new catalogue when it's out.,winback,yes
+CUSE511M,Hibernating,survey response,56,We need integration with our inventory system. Without it we're doing double entry every week.,product_gap,no
+CUSV1V93,Hibernating,account note,55,The product's fine but the online ordering experience is painful. Takes me ten minutes to do something that should take two.,product_gap,no
+CUSHZIOY,Hibernating,account note,7,Quick one — what's the current lead time on bulk orders?,admin,no
+CUSSWM31,Hibernating,survey response,32,Do you have a copy of the invoice for order 4471? Finance needs it for reconciliation.,admin,no
+CUSWJCKJ,Hibernating,email to rep,22,Do you have anything in a larger format? The current size doesn't quite work for our use case.,product_gap,no
+CUS60FKH,Hibernating,email to rep,39,The product's fine but the online ordering experience is painful. Takes me ten minutes to do something that should take two.,product_gap,no
+CUST0HL9,Hibernating,survey response,20,Need to change the card on file before the next order goes through.,admin,no
+CUSUOVW1,Hibernating,support ticket,59,Quality's been inconsistent across the last two batches. Not a dealbreaker yet but worth flagging.,product_gap,no
+CUSY0IFZ,Hibernating,support ticket,40,Need to change the card on file before the next order goes through.,admin,no
+CUSH75LX,Hibernating,email to rep,37,The price increase landed without much warning. Hard to justify internally at that level.,price,no
+CUSHHPBM,Hibernating,survey response,37,"Haven't ordered in a while because our project was on hold. It's back on now, so expect to hear from me.",winback,yes
+CUS5USGI,Hibernating,support ticket,45,Budget's been cut for next year so I'll need to review what we're spending with you.,price,no
+CUSGOG72,Hibernating,support ticket,75,Can you update the delivery address on my account? Moved offices last month.,admin,no
+CUSXA11D,Hibernating,survey response,26,The product's fine but the online ordering experience is painful. Takes me ten minutes to do something that should take two.,product_gap,no
+CUSR23GD,Lost,account note,19,Procurement is running a formal tender this quarter. You'll be invited but so will three others.,competitor,no
+CUS8G8JD,Lost,support ticket,88,Budget's been cut for next year so I'll need to review what we're spending with you.,price,no
+CUS43D8W,Lost,survey response,71,Sorry for going quiet — we had a restructure and everything got paused. Looking to start ordering again next quarter.,winback,yes
+CUSITFOY,Lost,survey response,40,"Honestly, the only reason we haven't switched is inertia. That won't hold forever.",competitor,no
+CUSF877V,Lost,email to rep,4,Please close my account and remove me from the mailing list. Thanks.,quiet_churn,no
+CUSKEYZ7,Lost,survey response,90,"We've wound down the part of the business that used your products, so we won't be ordering again.",quiet_churn,no
+CUS5Q14J,Lost,email to rep,74,Budget's been cut for next year so I'll need to review what we're spending with you.,price,no
+CUSPTK93,Lost,account note,20,Budget's been cut for next year so I'll need to review what we're spending with you.,price,no
+CUS6QICA,Lost,account note,56,Don't need anything further. You can stop the reminder emails.,quiet_churn,no
+CUS6SYLZ,Lost,survey response,36,"Honestly, the only reason we haven't switched is inertia. That won't hold forever.",competitor,no
+CUSJ2QP8,Lost,email to rep,44,Budget's been cut for next year so I'll need to review what we're spending with you.,price,no
+CUSBMYYM,Lost,account note,64,Still here! Just haven't had the need. Send me the new catalogue when it's out.,winback,yes
+CUSGVYIE,Lost,account note,9,Budget's been cut for next year so I'll need to review what we're spending with you.,price,no
+CUSGXN0G,Lost,email to rep,45,We've been trialling another supplier alongside you for the last two months. Their turnaround has been faster.,competitor,no
+CUS63CFL,Lost,email to rep,11,Don't need anything further. You can stop the reminder emails.,quiet_churn,no
+CUSCIYHE,Lost,account note,19,A competitor approached us with a bundled deal that's hard to ignore. Wanted to give you the chance to respond.,competitor,no
+CUSZE5R5,Lost,account note,8,"We've wound down the part of the business that used your products, so we won't be ordering again.",quiet_churn,no
+CUS8Z2FL,Lost,survey response,52,"Been using up old stock, that's all. We'll be back in the market shortly.",winback,yes
+CUSOTOHP,Lost,account note,53,Please close my account and remove me from the mailing list. Thanks.,quiet_churn,no
+CUS4GH2M,Lost,survey response,32,Cancel the subscription please. I don't want to be charged again.,quiet_churn,no

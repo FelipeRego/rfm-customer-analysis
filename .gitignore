@@ -1,0 +1,9 @@
+.DS_Store
+__pycache__/
+
+# Cached Jev judgments. 'live' holds real answers and is safe to keep locally but
+# is machine-specific; 'offline' holds synthetic stubs and must never be shared.
+.jev_cache/
+
+# API keys — never commit these
+.env

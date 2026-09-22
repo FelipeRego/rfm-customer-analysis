@@ -48,17 +48,24 @@ Each customer is scored 1–5 on all three dimensions:
 | Lost | Low R, low F |
 
 ### CLV Calculation
-Customer Lifetime Value estimated as:
 
 ```
-CLV = (monetaryValue / frequency) × frequency × lifespan_years × margin
+CLV = observed annual profit  ×  P(still active)  ×  discounted horizon
 ```
+
+The earlier formula, `(monetaryValue / frequency) × frequency × lifespan × margin`,
+cancelled its own frequency terms and reduced to `monetaryValue × 0.6` — a rescaling
+of M that added nothing. Frequency now enters through `p_active` instead, so silence
+is judged against each customer's own purchase cycle rather than a fixed threshold.
 
 - **Lifespan:** 3 years
 - **Margin:** 20%
+- **Observation window:** 365 days *(an assumption; set to your real extract window)*
+- **Discount rate:** 10% annually
+- **Lapse decay:** 0.5
 
 ### Output
-`rfm_analysis.csv` with fields: `customerid`, `recency`, `frequency`, `monetaryValue`, `r_score`, `f_score`, `m_score`, `rfm_score`, `segment`, `clv`
+`rfm_analysis.csv` with fields: `customerid`, `recency`, `frequency`, `monetaryValue`, `r_score`, `f_score`, `m_score`, `rfm_score`, `segment`, `aov`, `expected_gap`, `p_active`, `clv`
 
 ---
 
