@@ -1,61 +1,89 @@
-I rebuilt my RFM customer analysis this week.
+Your customer data has two halves.
 
-The most useful thing that happened was discovering how much of it was wrong.
+The numbers: when they last bought, how often, how much they spend.
 
-Three things I had shipped and believed:
+And the words: what they actually wrote to you. Support tickets. Survey replies. The email to their account manager.
 
-**1. My Customer Lifetime Value formula was meaningless.**
+Almost all customer analytics uses the first half and quietly ignores the second.
 
-I used the textbook one: average order value × frequency × lifespan × margin.
-
-But average order value IS total spend divided by frequency. The frequency terms cancel. Every CLV I had calculated was just total spend × 0.6 — a rescaling of a column I already had.
-
-A customer who spent $1,000 across ten orders scored identically to one who spent $1,000 once and never came back.
-
-**2. My output file did not match my own code.**
-
-20 of 100 customers were sitting in the wrong segment. Every chart and every slide downstream had been built on that file.
-
-**3. My documentation described the segmentation as a table of rules.**
-
-It is actually an ordered chain, where earlier rules silently override later ones. 13 of the 25 possible score combinations matched more than one "rule".
+This week I found out what that costs.
 
 ---
 
-Then I added the thing RFM structurally cannot do.
+**The blind spot**
 
-RFM reads behaviour: how recently, how often, how much. Which means it is blind — by construction — to a customer who has decided to leave but has not stopped buying yet. They score 5/5/5 right up until they are gone.
+RFM analysis scores customers on Recency, Frequency and Monetary value, then sorts them into groups like Champions, At Risk and Lost. It is a good method. I use it constantly.
 
-So I had a model read what customers actually wrote, and score every message on five things: are they signalling they will leave, how serious is the problem, what is driving it, can we still save them, and does this need a person.
+But it only reads behaviour.
 
-It surfaced 5 customers who looked perfectly healthy on every purchase measure while telling us they were unhappy. 8.5% of portfolio value.
+Which means it cannot see a customer who has decided to leave and simply hasn't stopped buying yet.
 
----
-
-And then it caught a mistake in MY logic.
-
-It scored an unresolved service failure as HIGH severity (0.90) but LOW intent to leave (0.22).
-
-I assumed that was a miss. It was not. A furious customer complaining TO you has not left — they are giving you a chance. Meanwhile "please close my account" scored the exact inverse: 0.78 intent, 0.14 severity.
-
-But my scoring blended those two into a single risk number. Which filed a top-tier customer, sitting on an unresolved failure, as safe.
-
-That is precisely the customer who leaves without warning.
-
-**"Angry" and "leaving" are not the same signal. Average them and you hide both.**
+That customer scores 5 out of 5 on everything. Right up until the day they are gone.
 
 ---
 
-What I keep relearning: the value is not in going faster.
+**What I added**
 
-It is in having something check the work you were too confident to check yourself.
+I used Jev, a model that reads text and answers specific questions with numbers rather than paragraphs.
 
-Three of those four findings were bugs I wrote, shipped, and would never have gone looking for.
+For every customer message, it answered five:
 
-Code is public, including the charts and the deck: https://github.com/FelipeRego/rfm-customer-analysis
+→ Are they signalling they want to leave?
+→ How serious is the problem they describe?
+→ What is driving it — service, price, the product, a competitor?
+→ Could we still keep them if we acted this fortnight?
+→ Does this need a person, or will a campaign do?
 
-(Demonstration dataset, and the customer messages are synthetic — but every one of those bugs was real.)
+No training data. No labelled examples. No model to retrain. You write the question in plain English and get a number back that your code can use.
 
-What is sitting in your pipeline that you have never re-derived?
+---
 
-#CustomerAnalytics #RFMAnalysis #CustomerLifetimeValue #DataQuality #CustomerSegmentation #Churn #CRM #MarketingAnalytics #Analytics
+**What it found**
+
+5 customers who looked completely healthy on every purchase measure, while telling us they were unhappy.
+
+8.5% of total portfolio value. Four of the five had an unresolved service complaint sitting there.
+
+RFM ranked every one of them as safe. It had no way not to.
+
+---
+
+**The part I didn't expect**
+
+"Angry" and "leaving" are not the same signal.
+
+An unresolved service failure scored 0.90 on severity — and only 0.22 on intent to leave.
+
+That is correct. A furious customer complaining TO you hasn't left. They are giving you a chance.
+
+Meanwhile "please close my account" scored the exact inverse: 0.78 on leaving, 0.14 on severity. Calm, polite, and final.
+
+Two different problems. Two different responses. Most churn scores blend them into one number and lose both.
+
+---
+
+**And it says when it isn't sure**
+
+For 2 of 8 customer groups, several actions were equally defensible — so it said so, instead of picking one and sounding confident.
+
+Those went to a person for review rather than onto a recommendation slide.
+
+A model that admits uncertainty is far more useful than one that guesses well.
+
+---
+
+**The rule I held to throughout**
+
+The model never touches a number.
+
+Every score, every threshold, every dollar figure stays in ordinary code. The model reads meaning. The arithmetic stays where it can be checked, argued with, and corrected.
+
+That is the whole idea. Not replacing the analysis — reading the half of your data the analysis was never able to see.
+
+Code, charts and the full deck: https://github.com/FelipeRego/rfm-customer-analysis
+
+(Demonstration dataset; the customer messages are synthetic.)
+
+What is your customer base telling you in words that your dashboard cannot see?
+
+#CustomerAnalytics #CustomerExperience #CustomerRetention #Churn #RFMAnalysis #CRM #MarketingAnalytics #VoiceOfCustomer
