@@ -10,18 +10,48 @@ from pptx.util import Inches, Pt
 import copy
 
 # ── COLOURS ───────────────────────────────────────────────────────────────────
-NAVY       = RGBColor(0x00, 0x33, 0x66)
-BLUE       = RGBColor(0x00, 0x70, 0xC0)
-LIGHT_BLUE = RGBColor(0xBD, 0xD7, 0xEE)
+# Every combination used below meets WCAG AA against the surface it sits on:
+# 4.5:1 for body text, 3:1 for large text (>=18pt, or >=14pt bold).
+#
+# Two colours are surface-dependent. Gold and pale blue read well on navy and are
+# unusable on white or light grey — gold on light grey is 1.47:1, which is why
+# "$599" was effectively invisible. Each therefore has an ON-LIGHT variant, and the
+# bright originals are reserved for navy backgrounds.
+NAVY       = RGBColor(0x00, 0x33, 0x66)   # 12.6:1 on white
+BLUE       = RGBColor(0x00, 0x70, 0xC0)   #  4.6:1 on light grey
 WHITE      = RGBColor(0xFF, 0xFF, 0xFF)
-DARK       = RGBColor(0x1A, 0x1A, 0x1A)
-GRAY       = RGBColor(0x59, 0x59, 0x59)
+DARK       = RGBColor(0x1A, 0x1A, 0x1A)   # 15.6:1 on light grey
+GRAY       = RGBColor(0x59, 0x59, 0x59)   #  6.3:1 on light grey
 LGRAY      = RGBColor(0xF2, 0xF2, 0xF2)
-RED        = RGBColor(0xC0, 0x00, 0x00)
-GOLD       = RGBColor(0xFF, 0xC0, 0x00)
-GOLD_DARK  = RGBColor(0xB8, 0x86, 0x00)
-GREEN      = RGBColor(0x00, 0x70, 0x50)
+RED        = RGBColor(0xC0, 0x00, 0x00)   #  5.8:1 on light grey
+GREEN      = RGBColor(0x00, 0x70, 0x50)   #  5.5:1 on light grey
 DIVIDER    = RGBColor(0xD6, 0xD6, 0xD6)
+
+# On navy only.
+LIGHT_BLUE = RGBColor(0xBD, 0xD7, 0xEE)   #  8.5:1 on navy,  1.3:1 on light — navy only
+GOLD       = RGBColor(0xFF, 0xC0, 0x00)   #  7.7:1 on navy,  1.5:1 on light — navy only
+
+# On white / light grey only.
+GOLD_ON_LIGHT = RGBColor(0x8A, 0x68, 0x00)   # 4.6:1 on light grey
+SKY_ON_LIGHT  = RGBColor(0x00, 0x76, 0xA1)   # 4.6:1 on light grey
+GOLD_DARK     = GOLD_ON_LIGHT                # previous name, kept for call sites
+
+# ── TYPE SCALE ────────────────────────────────────────────────────────────────
+# Sized for projection: legible from the back of a room, not from a laptop. The
+# previous deck ran at 8-9pt with 6.5pt footnotes, which is a document, not a slide.
+# Nothing here goes below 12pt, and no content the audience must read is under 16pt.
+T_HERO      = 44   # title slide
+T_TITLE     = 28   # slide title
+T_SUBTITLE  = 15   # line under the title
+T_KPI_VAL   = 40   # the single number on a card
+T_KPI_LABEL = 15
+T_KPI_SUB   = 13
+T_H2        = 22   # card / column heading
+T_BODY      = 18   # default body copy
+T_DENSE     = 16   # tables and multi-column blocks
+T_CAPTION   = 14   # chart captions, secondary notes
+T_LABEL     = 13   # small-caps section labels
+T_MICRO     = 12   # footer, slide number, disclosures — floor for the deck
 
 # ── LOAD DATA ─────────────────────────────────────────────────────────────────
 with open('rfm_analysis.csv') as f:
@@ -93,9 +123,8 @@ for p in priority:
     if p['driver'] != 'none':
         driver_counts[p['driver']] = driver_counts.get(p['driver'], 0) + 1
 
-SYNTHETIC_NOTE = ('Customer messages in this analysis are illustrative sample text, '
-                  'generated to demonstrate the method. Replace with real support '
-                  'and survey data before acting on named accounts.')
+SYNTHETIC_NOTE = ('Customer messages are illustrative sample text, not real customer data. '
+                  'Replace with real support and survey data before acting on named accounts.')
 
 champ = seg_summary.get('Champions', {})
 loyal = seg_summary.get('Loyal', {})
@@ -141,7 +170,7 @@ def box(s, x, y, w, h, fill=None, line=None):
         sh.line.fill.background()
     return sh
 
-def txt(s, text, x, y, w, h, size=11, bold=False, color=DARK, align=PP_ALIGN.LEFT,
+def txt(s, text, x, y, w, h, size=T_BODY, bold=False, color=DARK, align=PP_ALIGN.LEFT,
         italic=False, wrap=True):
     txb = s.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
     txb.word_wrap = wrap
@@ -157,31 +186,46 @@ def txt(s, text, x, y, w, h, size=11, bold=False, color=DARK, align=PP_ALIGN.LEF
     run.font.color.rgb = color
     return txb
 
+TITLE_CHAR_LIMIT = 46   # roughly one line at T_TITLE across the 12.5in title box
+
+
 def header_band(s, title, subtitle=None):
-    box(s, 0, 0, 13.33, 1.1, fill=NAVY)
-    txt(s, title, 0.4, 0.12, 11, 0.55, size=20, bold=True, color=WHITE)
+    """Navy band with the slide title and an optional supporting line.
+
+    The title box is sized for ONE line. Previously the band gave a 20pt title
+    0.55in and several titles ran to 100 characters, so they wrapped and the
+    second line printed straight through the subtitle. Anything over the limit
+    is caught at build time rather than discovered in the PDF.
+    """
+    if len(title) > TITLE_CHAR_LIMIT:
+        raise ValueError(
+            f'Slide title is {len(title)} chars, over the {TITLE_CHAR_LIMIT} that fit '
+            f'on one line at {T_TITLE}pt — it will overlap the subtitle. '
+            f'Move the detail into the subtitle: {title!r}')
+    box(s, 0, 0, 13.33, 1.15, fill=NAVY)
+    txt(s, title, 0.4, 0.09, 12.5, 0.52, size=T_TITLE, bold=True, color=WHITE)
     if subtitle:
-        txt(s, subtitle, 0.4, 0.65, 11, 0.38, size=11, color=LIGHT_BLUE)
+        txt(s, subtitle, 0.4, 0.62, 12.5, 0.34, size=T_SUBTITLE, color=LIGHT_BLUE)
 
 def slide_number(s, n):
-    txt(s, str(n), 12.8, 7.1, 0.4, 0.3, size=9, color=GRAY, align=PP_ALIGN.RIGHT)
+    txt(s, str(n), 12.7, 7.03, 0.5, 0.3, size=T_MICRO, color=GRAY, align=PP_ALIGN.RIGHT)
 
 def footer_line(s):
     ln = s.shapes.add_connector(1,
-        Inches(0.4), Inches(7.15), Inches(12.93), Inches(7.15))
+        Inches(0.4), Inches(7.08), Inches(12.93), Inches(7.08))
     ln.line.color.rgb = DIVIDER
     ln.line.width = Pt(0.5)
-    txt(s, 'CONFIDENTIAL — RFM Customer Analysis', 0.4, 7.18, 6, 0.25,
-        size=7, color=GRAY)
+    txt(s, 'CONFIDENTIAL — RFM Customer Analysis', 0.4, 7.12, 6, 0.28,
+        size=T_MICRO, color=GRAY)
 
 def kpi_card(s, x, y, w, h, label, value, sub=None, bg=LGRAY, val_color=NAVY):
     box(s, x, y, w, h, fill=bg)
-    txt(s, label, x+0.15, y+0.1, w-0.3, 0.3, size=9, color=GRAY)
-    txt(s, value, x+0.15, y+0.38, w-0.3, 0.55, size=22, bold=True, color=val_color)
+    txt(s, label, x+0.18, y+0.12, w-0.36, 0.46, size=T_KPI_LABEL, color=GRAY)
+    txt(s, value, x+0.18, y+0.62, w-0.36, 0.78, size=T_KPI_VAL, bold=True, color=val_color)
     if sub:
-        txt(s, sub, x+0.15, y+0.9, w-0.3, 0.25, size=8, color=GRAY)
+        txt(s, sub, x+0.18, y+1.44, w-0.36, 0.40, size=T_KPI_SUB, color=GRAY)
 
-def bullet(tf, text, size=10.5, bold=False, color=DARK, indent=0):
+def bullet(tf, text, size=T_BODY, bold=False, color=DARK, indent=0):
     p = tf.add_paragraph()
     p.alignment = PP_ALIGN.LEFT
     p.level = indent
@@ -193,7 +237,7 @@ def bullet(tf, text, size=10.5, bold=False, color=DARK, indent=0):
     return p
 
 def section_label(s, text, x, y):
-    txt(s, text.upper(), x, y, 3, 0.22, size=7.5, bold=True, color=BLUE)
+    txt(s, text.upper(), x, y, 6.5, 0.28, size=T_LABEL, bold=True, color=BLUE)
 
 # ── SLIDE 1 — TITLE ───────────────────────────────────────────────────────────
 s1 = slide()
@@ -203,13 +247,13 @@ box(s1, 0, 3.6, 13.33, 0.04, fill=GOLD)
 box(s1, 0, 0, 0.18, 7.5, fill=BLUE)
 
 txt(s1, 'Unlocking Customer Value Through\nBehavioural Segmentation',
-    0.55, 1.4, 9.5, 1.9, size=36, bold=True, color=WHITE)
+    0.55, 1.4, 9.5, 1.9, size=T_HERO, bold=True, color=WHITE)
 txt(s1, 'RFM Analysis — Customer Intelligence Report',
-    0.55, 3.25, 9, 0.45, size=14, color=LIGHT_BLUE)
+    0.55, 3.25, 9, 0.45, size=T_H2, color=LIGHT_BLUE)
 txt(s1, f'Analysis across {total} customers  |  {len(seg_summary)} of 11 behavioural segments present  |  {LIFESPAN_LABEL} CLV horizon',
-    0.55, 3.85, 10, 0.35, size=11, color=LIGHT_BLUE, italic=True)
-txt(s1, 'March 2026', 0.55, 6.9, 4, 0.35, size=10, color=LIGHT_BLUE)
-txt(s1, 'CONFIDENTIAL', 10.5, 6.9, 2.5, 0.35, size=9, color=GOLD,
+    0.55, 3.85, 10, 0.35, size=T_BODY, color=LIGHT_BLUE, italic=True)
+txt(s1, 'March 2026', 0.55, 6.9, 4, 0.35, size=T_BODY, color=LIGHT_BLUE)
+txt(s1, 'CONFIDENTIAL', 10.5, 6.9, 2.5, 0.35, size=T_DENSE, color=GOLD,
     align=PP_ALIGN.RIGHT)
 
 # ── SLIDE 2 — EXECUTIVE SUMMARY ───────────────────────────────────────────────
@@ -236,10 +280,10 @@ findings = [
 
 for i, (col, num, headline, detail) in enumerate(findings):
     y = 1.3 + i * 1.85
-    box(s2, 0.4, y, 0.06, 1.4, fill=col)
-    txt(s2, num, 0.6, y, 0.6, 0.4, size=11, bold=True, color=col)
-    txt(s2, headline, 1.3, y, 11.2, 0.42, size=12.5, bold=True, color=DARK)
-    txt(s2, detail,   1.3, y+0.42, 11.2, 0.9, size=10, color=GRAY)
+    box(s2, 0.4, y, 0.07, 1.56, fill=col)
+    txt(s2, num, 0.62, y+0.02, 0.7, 0.42, size=T_BODY, bold=True, color=col)
+    txt(s2, headline, 1.35, y, 11.5, 0.46, size=T_H2, bold=True, color=DARK)
+    txt(s2, detail,   1.35, y+0.88, 11.5, 0.9, size=T_BODY, color=GRAY)
 
 # ── SLIDE 3 — METHODOLOGY ─────────────────────────────────────────────────────
 s3 = slide()
@@ -248,124 +292,135 @@ header_band(s3, 'Methodology',
 footer_line(s3)
 slide_number(s3, 3)
 
+# Copy shortened to fit ~36 characters a line in a 2.35in column at projection
+# size, and the CLV description corrected — it still described the old formula,
+# which cancelled its own frequency terms.
 steps = [
-    ('R — Recency', 'Days since last purchase.\nLower recency = higher score (1–5).\nCustomers scored via percentile rank.',         BLUE),
-    ('F — Frequency', 'Number of distinct purchases.\nDirect ladder: 1 tx → score 1,\n5+ tx → score 5.',                            NAVY),
-    ('M — Monetary', 'Total spend to date.\nHigher spend = higher score (1–5).\nCustomers scored via percentile rank.',              BLUE),
-    ('Segmentation', '11 segments assigned via\nR×F score matrix — from\nChampions to Lost.',                                        NAVY),
-    ('CLV Estimate', 'avg_order × freq × 3 yrs × 20%\nmargin. Consistent 3-year\nhorizon for comparability.',                       BLUE),
+    ('R — Recency',   'Days since the last purchase.\nMore recent scores higher.\nRanked by percentile.',      BLUE),
+    ('F — Frequency', 'Number of purchases.\n1 purchase scores 1,\n5 or more scores 5.',                       NAVY),
+    ('M — Monetary',  'Total spend to date.\nHigher spend scores higher.\nRanked by percentile.',              BLUE),
+    ('Segmentation',  '11 possible segments from\nthe R x F matrix, Champions\nthrough to Lost.',              NAVY),
+    ('CLV Estimate',  'Annual profit, multiplied by\nthe chance they stay, over a\ndiscounted 3-year horizon.', BLUE),
 ]
 
 for i, (title, body, col) in enumerate(steps):
-    x = 0.4 + i * 2.55
-    box(s3, x, 1.25, 2.35, 0.06, fill=col)
-    txt(s3, f'{i+1}', x, 1.45, 0.4, 0.38, size=18, bold=True, color=col)
-    txt(s3, title,   x, 1.9,  2.2, 0.35, size=11, bold=True, color=DARK)
-    txt(s3, body,    x, 2.32, 2.2, 1.0,  size=9.5, color=GRAY)
+    x = 0.4 + i * 2.52
+    box(s3, x, 1.30, 2.35, 0.07, fill=col)
+    txt(s3, f'{i+1}', x, 1.48, 0.6, 0.46, size=T_TITLE, bold=True, color=col)
+    txt(s3, title,   x, 2.02, 2.35, 0.36, size=T_BODY, bold=True, color=DARK)
+    txt(s3, body,    x, 2.48, 2.35, 1.75, size=T_DENSE, color=GRAY)
 
-box(s3, 0.4, 3.55, 12.5, 0.04, fill=DIVIDER)
+box(s3, 0.4, 4.45, 12.5, 0.04, fill=DIVIDER)
 
-txt(s3, 'Configuration', 0.4, 3.75, 3, 0.3, size=9, bold=True, color=NAVY)
+txt(s3, 'Configuration', 0.4, 4.68, 4, 0.34, size=T_BODY, bold=True, color=NAVY)
 configs = [
-    ('Input file', 'rfm_mockup.csv'),
+    ('Input file',         'rfm_mockup.csv'),
     ('Customers analysed', f'{total}'),
-    ('CLV lifespan', '3 years'),
-    ('Margin assumption', '20%'),
-    ('Segments', '11'),
-    ('Output file', 'rfm_analysis.csv'),
+    ('CLV lifespan',       '3 years'),
+    ('Margin assumption',  '20%'),
+    ('Segments present',   f'{len(seg_summary)} of 11'),
+    ('Output file',        'rfm_analysis.csv'),
 ]
 for i, (k, v) in enumerate(configs):
-    col_x = 0.4 + (i % 3) * 4.1
-    row_y = 4.05 + (i // 3) * 0.45
-    txt(s3, f'{k}:  ', col_x, row_y, 1.8, 0.35, size=9.5, color=GRAY)
-    txt(s3, v, col_x + 1.55, row_y, 2.3, 0.35, size=9.5, bold=True, color=DARK)
+    col_x = 0.4 + (i % 3) * 4.2
+    row_y = 5.12 + (i // 3) * 0.58
+    txt(s3, f'{k}:', col_x, row_y, 2.4, 0.36, size=T_DENSE, color=GRAY)
+    txt(s3, v, col_x + 2.25, row_y, 1.9, 0.36, size=T_DENSE, bold=True, color=DARK)
 
 # ── SLIDE 4 — SEGMENT LANDSCAPE ───────────────────────────────────────────────
 s4 = slide()
 header_band(s4, 'Segment Landscape',
-            f'The {total}-customer base spans 11 segments with a total estimated portfolio CLV of ${total_clv:,.0f}')
+            f'{total} customers across {len(seg_summary)} active segments · ${total_clv:,.0f} total estimated CLV')
 footer_line(s4)
 slide_number(s4, 4)
 
-headers = ['Segment', 'Customers', 'Share', 'Avg CLV', 'Total CLV', 'Avg Recency', 'Strategic Priority']
-col_xs  = [0.35, 2.85, 3.75, 4.75, 5.95, 7.35, 8.55]
-col_ws  = [2.45, 0.85, 0.95, 1.15, 1.35, 1.15, 4.3]
+# Rebuilt for projection. "Share" was dropped: with 100 customers it restated the
+# count. The priority column was long prose that wrapped into the row below, and it
+# carried its urgency in colour alone — the word now says it, and colour reinforces.
+headers = ['Segment', 'Customers', 'Avg CLV', 'Total CLV', 'Avg Recency', 'Priority']
+col_xs  = [0.35, 3.45, 5.00, 6.75, 8.60, 10.65]
+col_ws  = [3.05, 1.50, 1.70, 1.80, 2.00, 2.25]
 
-box(s4, 0.35, 1.2, 12.6, 0.38, fill=NAVY)
+ROW_Y, ROW_H, ROW_PITCH = 1.92, 0.60, 0.62
+
+box(s4, 0.35, 1.32, 12.6, 0.52, fill=NAVY)
 for hdr, cx, cw in zip(headers, col_xs, col_ws):
-    txt(s4, hdr, cx+0.05, 1.24, cw, 0.3, size=8.5, bold=True, color=WHITE)
+    txt(s4, hdr, cx+0.08, 1.42, cw, 0.34, size=T_DENSE, bold=True, color=WHITE)
 
 priorities = {
-    'Champions':          ('Protect & deepen — highest CLV, highest loyalty',       GREEN),
-    'Loyal':              ('Reward & upsell — consistent, high-value base',          GREEN),
-    'Potential Loyalist': ('Nudge to loyalty — targeted incentives',                 BLUE),
-    'Promising':          ('Onboard & engage — early-stage, high conversion upside', BLUE),
-    'New Customer':       ('Welcome & educate — first impression drives LTV',        BLUE),
-    'Hibernating':        ('Re-engage — time-sensitive before permanent churn',      RED),
-    'Lost':               ('Win-back — selective recovery, low probability',         RED),
+    'Champions':          ('Protect',   GREEN),
+    'Loyal':              ('Reward',    GREEN),
+    'Potential Loyalist': ('Nudge',     BLUE),
+    'Promising':          ('Onboard',   BLUE),
+    'New Customer':       ('Welcome',   BLUE),
+    'Need Attention':     ('Review',    GOLD_ON_LIGHT),
+    'Hibernating':        ('Re-engage', RED),
+    'Lost':               ('Win back',  RED),
 }
 
 for i, seg in enumerate(seg_order):
     d    = seg_summary[seg]
     pri, pcol = priorities.get(seg, ('Monitor', GRAY))
     bg = LGRAY if i % 2 == 0 else WHITE
-    y  = 1.62 + i * 0.52
-    box(s4, 0.35, y, 12.6, 0.5, fill=bg)
+    y  = ROW_Y + i * ROW_PITCH
+    box(s4, 0.35, y, 12.6, ROW_H, fill=bg)
 
     vals = [
-        (seg,                                                 DARK,  True),
-        (str(d['count']),                                     DARK,  False),
-        (f"{round(d['count']/total*100)}%",                   GRAY,  False),
-        (f"${d['avg_clv']:,.0f}",                             NAVY,  True),
-        (f"${d['total_clv']:,.0f}",                           NAVY,  False),
-        (f"{d['avg_recency']} days",                          GRAY,  False),
-        (pri,                                                 pcol,  False),
+        (seg,                                   DARK,  True),
+        (str(d['count']),                       DARK,  False),
+        (f"${d['avg_clv']:,.0f}",               NAVY,  True),
+        (f"${d['total_clv']:,.0f}",             NAVY,  False),
+        (f"{d['avg_recency']:.0f} days",        GRAY,  False),
+        (pri,                                   pcol,  True),
     ]
     for (v, vc, vb), cx, cw in zip(vals, col_xs, col_ws):
-        txt(s4, v, cx+0.05, y+0.1, cw-0.1, 0.3, size=9, bold=vb, color=vc)
+        txt(s4, v, cx+0.08, y+0.14, cw-0.12, 0.34, size=T_DENSE, bold=vb, color=vc)
 
 # ── SLIDE 5 — VALUE CONCENTRATION ─────────────────────────────────────────────
 s5 = slide()
 header_band(s5,
-    f'Champions and Loyal customers ({value_pct_c}% of base) generate {value_pct_v}% of total portfolio CLV',
-    'The classic 80/20 dynamic is present — concentration at the top is both an asset and a risk')
+    'Where the Value Is Concentrated',
+    f'Champions and Loyal are {value_pct_c}% of the base and {value_pct_v}% of portfolio CLV — '
+    f'an asset and a risk at once')
 footer_line(s5)
 slide_number(s5, 5)
 
 kpis = [
-    ('Champions — Avg CLV',    f'${champ["avg_clv"]:,.0f}',  f'{champ["count"]} customers  |  avg recency {champ["avg_recency"]} days'),
-    ('Loyal — Avg CLV',        f'${loyal["avg_clv"]:,.0f}',  f'{loyal["count"]} customers  |  avg recency {loyal["avg_recency"]} days'),
+    ('Champions — Avg CLV',    f'${champ["avg_clv"]:,.0f}',  f'{champ["count"]} customers  |  avg recency {champ["avg_recency"]:.0f} days'),
+    ('Loyal — Avg CLV',        f'${loyal["avg_clv"]:,.0f}',  f'{loyal["count"]} customers  |  avg recency {loyal["avg_recency"]:.0f} days'),
     ('Portfolio Total CLV',    f'${total_clv:,.0f}',          f'Across all {total} customers'),
     ('Value Seg. CLV Share',   f'{value_pct_v}%',             f'Delivered by {value_pct_c}% of customers'),
 ]
 for i, (lbl, val, sub) in enumerate(kpis):
-    kpi_card(s5, 0.4 + i*3.15, 1.25, 3.0, 1.25, lbl, val, sub)
+    kpi_card(s5, 0.4 + i*3.15, 1.25, 3.0, 1.95, lbl, val, sub)
 
-box(s5, 0.4, 2.7, 12.5, 0.04, fill=DIVIDER)
+box(s5, 0.4, 3.30, 12.5, 0.04, fill=DIVIDER)
 
 # Horizontal CLV bar chart (manual)
-txt(s5, 'Total CLV by Segment', 0.4, 2.85, 6, 0.3, size=10, bold=True, color=NAVY)
+txt(s5, 'Total CLV by Segment', 0.4, 3.40, 6, 0.34, size=T_BODY, bold=True, color=NAVY)
 max_clv = max(d['total_clv'] for d in seg_summary.values())
 bar_w_max = 7.5
 seg_colors = {
-    'Champions': BLUE, 'Loyal': GREEN, 'Potential Loyalist': GOLD,
-    'Promising': LIGHT_BLUE, 'New Customer': RGBColor(0x00,0xB0,0xF0),
-    'Hibernating': RGBColor(0xCC,0x79,0xA7), 'Lost': GRAY,
+    'Champions': BLUE, 'Loyal': GREEN, 'Potential Loyalist': GOLD_ON_LIGHT,
+    'Promising': SKY_ON_LIGHT, 'New Customer': RGBColor(0x00, 0x5F, 0x73),
+    'Need Attention': RGBColor(0x7B, 0x6F, 0xB0),
+    'Hibernating': RGBColor(0xCC, 0x79, 0xA7), 'Lost': GRAY,
 }
 for i, seg in enumerate(seg_order):
     d  = seg_summary[seg]
-    y  = 3.25 + i * 0.48
+    y  = 3.84 + i * 0.40
     bw = bar_w_max * (d['total_clv'] / max_clv)
     col = seg_colors.get(seg, GRAY)
-    txt(s5, seg, 0.4, y, 2.4, 0.36, size=9, color=DARK)
-    box(s5, 2.85, y+0.05, max(bw, 0.05), 0.32, fill=col)
-    txt(s5, f'${d["total_clv"]:,.0f}', 2.85 + bw + 0.1, y, 1.8, 0.36, size=9, color=DARK)
+    txt(s5, seg, 0.4, y, 2.4, 0.34, size=T_DENSE, color=DARK)
+    box(s5, 2.85, y+0.04, max(bw, 0.05), 0.28, fill=col)
+    txt(s5, f'${d["total_clv"]:,.0f}', 2.85 + bw + 0.12, y, 1.8, 0.34, size=T_DENSE, color=DARK)
 
 # ── SLIDE 6 — AT-RISK COHORT ──────────────────────────────────────────────────
 s6 = slide()
 header_band(s6,
-    f'{at_risk_pct_c}% of customers show lapsing behaviour — ${at_risk_clv:,.0f} in CLV is at risk of permanent loss',
-    'Hibernating and Lost segments require time-sensitive intervention to prevent irreversible churn')
+    'The Lapsing Cohort',
+    f'{at_risk_pct_c}% of customers are drifting and ${at_risk_clv:,.0f} of CLV is at risk — '
+    f'the window for intervention is closing')
 footer_line(s6)
 slide_number(s6, 6)
 
@@ -378,53 +433,54 @@ for i, (seg_name, d, desc, col) in enumerate(at_risk_detail):
     x = 0.4 + i * 6.3
     box(s6, x, 1.25, 6.0, 4.5, fill=LGRAY)
     box(s6, x, 1.25, 0.08, 4.5, fill=col)
-    txt(s6, seg_name,         x+0.25, 1.35, 5.5, 0.38, size=14, bold=True, color=DARK)
-    txt(s6, f'{d["count"]} customers',  x+0.25, 1.78, 5.5, 0.3,  size=10, color=GRAY)
-    txt(s6, f'Avg CLV: ${d["avg_clv"]:,.0f}',    x+0.25, 2.08, 2.5, 0.35, size=13, bold=True, color=col)
-    txt(s6, f'Total CLV at risk: ${d["total_clv"]:,.0f}', x+0.25, 2.48, 5.5, 0.3, size=9.5, color=DARK)
-    txt(s6, f'Avg recency: {d["avg_recency"]} days',       x+0.25, 2.82, 5.5, 0.3, size=9.5, color=DARK)
-    txt(s6, desc, x+0.25, 3.25, 5.5, 0.9, size=9.5, color=GRAY)
+    txt(s6, seg_name,         x+0.25, 1.35, 5.5, 0.38, size=T_H2, bold=True, color=DARK)
+    txt(s6, f'{d["count"]} customers',  x+0.25, 1.78, 5.5, 0.3,  size=T_BODY, color=GRAY)
+    txt(s6, f'Avg CLV: ${d["avg_clv"]:,.0f}',    x+0.25, 2.08, 2.5, 0.35, size=T_H2, bold=True, color=col)
+    txt(s6, f'Total CLV at risk: ${d["total_clv"]:,.0f}', x+0.25, 2.48, 5.5, 0.3, size=T_DENSE, color=DARK)
+    txt(s6, f'Avg recency: {d["avg_recency"]} days',       x+0.25, 2.82, 5.5, 0.3, size=T_DENSE, color=DARK)
+    txt(s6, desc, x+0.25, 3.25, 5.5, 0.9, size=T_DENSE, color=GRAY)
 
 box(s6, 0.4, 5.9, 12.5, 0.55, fill=RGBColor(0xFF,0xF2,0xCC))
 txt(s6, f'⚠  Recommended action: Launch a re-engagement sequence within 30 days for Hibernating customers. '
         f'Prioritise the top quartile by CLV (above ${seg_clv_p75("Hibernating"):,.0f}). '
         f'A/B test discount vs. content-led reactivation.',
-    0.6, 5.97, 12.1, 0.4, size=9.5, color=RGBColor(0x7F, 0x60, 0x00))
+    0.6, 5.97, 12.1, 0.4, size=T_DENSE, color=RGBColor(0x7F, 0x60, 0x00))
 
 # ── SLIDE 7 — GROWTH PIPELINE ─────────────────────────────────────────────────
 s7 = slide()
 header_band(s7,
-    f'{growth_pct_c}% of the base are early-stage customers — structured nurture can convert them to high-value segments',
-    'New Customer, Promising, and Potential Loyalist cohorts represent the pipeline for future CLV growth')
+    'The Growth Pipeline',
+    f'{growth_pct_c}% of the base is early-stage — New Customer, Promising and Potential '
+    f'Loyalist are where future CLV is made')
 footer_line(s7)
 slide_number(s7, 7)
 
 growth_detail = [
     ('New Customer',       new_cust,  'Very recent, first purchase only.\nPriority: onboarding experience, second purchase incentive.', BLUE),
-    ('Promising',          promising, 'Recent, 1–2 purchases. Positive engagement signal.\nPriority: loyalty programme invitation, category expansion.', RGBColor(0x00,0xB0,0xF0)),
-    ('Potential Loyalist', pot_loyal, '2 purchases, moderate recency.\nPriority: reward next purchase, introduce referral mechanic.', GOLD),
+    ('Promising',          promising, 'Recent, 1–2 purchases. Positive engagement signal.\nPriority: loyalty programme invitation, category expansion.', SKY_ON_LIGHT),
+    ('Potential Loyalist', pot_loyal, '2 purchases, moderate recency.\nPriority: reward next purchase, introduce referral mechanic.', GOLD_ON_LIGHT),
 ]
 
 for i, (seg_name, d, desc, col) in enumerate(growth_detail):
     x = 0.4 + i * 4.2
     box(s7, x, 1.25, 3.95, 4.8, fill=LGRAY)
     box(s7, x, 1.25, 3.95, 0.07, fill=col)
-    txt(s7, seg_name,                      x+0.2, 1.42, 3.5, 0.38, size=12, bold=True, color=DARK)
-    txt(s7, f'{d["count"]} customers',     x+0.2, 1.83, 3.5, 0.28, size=9,  color=GRAY)
-    txt(s7, f'${d["avg_clv"]:,.0f}',       x+0.2, 2.15, 3.5, 0.5,  size=22, bold=True, color=col)
-    txt(s7, 'avg CLV',                     x+0.2, 2.65, 3.5, 0.25, size=8,  color=GRAY)
-    txt(s7, f'Avg recency: {d["avg_recency"]} days  |  Avg freq: {d["avg_frequency"]}x',
-        x+0.2, 2.95, 3.5, 0.28, size=8.5, color=DARK)
-    txt(s7, desc, x+0.2, 3.35, 3.5, 0.95, size=9, color=GRAY)
+    txt(s7, seg_name,                      x+0.22, 1.45, 3.5, 0.44, size=T_H2, bold=True, color=DARK)
+    txt(s7, f'{d["count"]} customers',     x+0.22, 1.95, 3.5, 0.32, size=T_DENSE,  color=GRAY)
+    txt(s7, f'${d["avg_clv"]:,.0f}',       x+0.22, 2.34, 3.5, 0.78, size=T_KPI_VAL, bold=True, color=col)
+    txt(s7, 'avg CLV',                     x+0.22, 3.08, 3.5, 0.30, size=T_CAPTION, color=GRAY)
+    txt(s7, f'Avg recency: {d["avg_recency"]:.0f} days\nAvg frequency: {d["avg_frequency"]}x',
+        x+0.22, 3.46, 3.5, 0.62, size=T_DENSE, color=DARK)
+    txt(s7, desc, x+0.22, 4.18, 3.5, 1.55, size=T_DENSE, color=GRAY)
 
 txt(s7, 'Migration target: move Promising and Potential Loyalist customers to Loyal status within 12 months',
-    0.4, 6.3, 12.5, 0.35, size=10, bold=True, color=NAVY)
+    0.4, 6.3, 12.5, 0.35, size=T_BODY, bold=True, color=NAVY)
 
 # ── SLIDE 8 — WHAT THE NUMBERS COULD NOT SEE ─────────────────────────────────
 if blind_spots:
     s7b = slide()
     header_band(s7b, 'What the Numbers Could Not See',
-                'Reading what customers wrote, alongside what they did')
+                'Still buying normally — and telling us they are unhappy')
     footer_line(s7b)
     slide_number(s7b, 8)
 
@@ -443,38 +499,63 @@ if blind_spots:
          'Something went wrong, unresolved', GOLD_DARK),
     ]
     for i, (label, value, sub, col) in enumerate(kpis):
-        kpi_card(s7b, 0.4 + i * 3.18, 1.25, 3.0, 1.25, label, value, sub, val_color=col)
+        kpi_card(s7b, 0.4 + i * 3.18, 1.25, 3.0, 1.95, label, value, sub, val_color=col)
 
-    section_label(s7b, 'Flagged by what they said, not what they bought', 0.4, 2.72)
+    section_label(s7b, 'Flagged by what they said, not what they bought', 0.4, 3.42)
 
-    cols = [('Customer', 0.4, 1.5), ('Segment', 1.9, 2.0), ('Lifetime value', 3.9, 1.6),
-            ('What is driving it', 5.5, 2.1), ('Why RFM missed them', 7.6, 5.3)]
+    cols = [('Customer', 0.4, 1.7), ('Segment', 2.1, 2.2), ('Lifetime value', 4.3, 1.7),
+            ('What is driving it', 6.0, 2.2), ('Why RFM missed them', 8.2, 4.7)]
     for name, cx, cw in cols:
-        txt(s7b, name.upper(), cx + 0.05, 3.0, cw - 0.1, 0.25, size=7.5, bold=True, color=GRAY)
+        txt(s7b, name.upper(), cx + 0.05, 3.76, cw - 0.1, 0.3, size=T_LABEL, bold=True, color=GRAY)
 
+    # Kept under ~44 characters: that is one line in a 4.7in column at T_DENSE,
+    # and a second line is clipped by the row beneath.
     WHY = {
-        'service': 'Still buying on schedule, but sitting on an unresolved failure',
-        'competitor': 'Still buying, while actively weighing up another supplier',
-        'price': 'Still buying, but the cost has become hard to justify',
-        'product': 'Still buying, though the product is not meeting the need',
-        'circumstance': 'Paused for reasons on their side, not ours',
+        'service':      'Buying on schedule, failure unresolved',
+        'competitor':   'Buying, but weighing up a competitor',
+        'price':        'Buying, but the cost is hard to justify',
+        'product':      'Buying, but the product does not fit',
+        'circumstance': 'Paused on their side, not ours',
     }
     for i, p in enumerate(blind_spots[:6]):
-        y  = 3.3 + i * 0.44
+        y  = 4.14 + i * 0.50
         bg = LGRAY if i % 2 == 0 else WHITE
-        box(s7b, 0.35, y, 12.6, 0.42, fill=bg)
+        box(s7b, 0.35, y, 12.6, 0.48, fill=bg)
         vals = [p['customerid'], p['segment'], f"${p['clv']:,.0f}",
                 p['driver'].title(), WHY.get(p['driver'], 'Behaviour looks healthy')]
         for v, (_, cx, cw) in zip(vals, cols):
-            txt(s7b, v, cx + 0.05, y + 0.09, cw - 0.1, 0.3, size=9, color=DARK)
+            txt(s7b, v, cx + 0.05, y + 0.11, cw - 0.1, 0.34, size=T_DENSE, color=DARK)
 
-    box(s7b, 0.4, 6.0, 12.5, 0.75, fill=RGBColor(0xED, 0xF3, 0xFA))
-    txt(s7b, 'Why this is invisible to RFM:  the model is built entirely from past purchases. '
-             'A customer who has decided to leave but has not yet stopped buying looks identical '
-             'to a loyal one — right up until they go. Their words are the only early warning.',
-        0.6, 6.12, 12.1, 0.55, size=9.5, color=NAVY)
+    # The "why RFM misses these" explanation moved into the subtitle: at projection
+    # size a 230-character paragraph could not share the page with the table.
+    txt(s7b, SYNTHETIC_NOTE, 0.4, 6.82, 12.5, 0.28, size=T_MICRO, italic=True, color=GRAY)
 
-    txt(s7b, SYNTHETIC_NOTE, 0.4, 6.87, 12.5, 0.25, size=6.5, italic=True, color=GRAY)
+# Alt text for the chart images. Read aloud by screen readers and shown when an
+# image fails to load, so each one states what the chart actually shows.
+CHART_ALT = {
+    'jev_chart_1_blindspots.png':
+        "Scatter plot. Horizontal axis: risk visible in the purchase history. Vertical "
+        "axis: risk stated in the customer's own words. Marker size shows lifetime value. "
+        "Five customers sit in the upper-left region of low behavioural risk and high "
+        "stated risk — CUS5907I, CUSCRUYF, CUS65KXV, CUSKOIXN and CUSOR56F — together "
+        "worth $3,502, or 8.5% of portfolio value.",
+    'jev_chart_2_intent_vs_severity.png':
+        "Paired-dot chart comparing two scores for each type of customer message. An "
+        "unresolved service failure scores 0.90 on problem severity but only 0.22 on "
+        "intent to leave. Quietly closing the account is the reverse: 0.78 on intent to "
+        "leave and 0.14 on severity. The two measures move independently of each other.",
+    'jev_chart_3_drivers.png':
+        "Horizontal bar chart of the dominant reason behind each of 100 customer messages. "
+        "Nothing, they are content: 36. The product itself: 26. Cost: 19. How we handled "
+        "them: 8. Something on their side: 7. A competitor: 4.",
+    'jev_chart_4_confidence.png':
+        "Horizontal bar chart of how certain the model was about the recommended action for "
+        "each customer group, against a 0.50 review threshold. Hibernating 1.00, Need "
+        "Attention 0.98, Lost 0.94, New Customer 0.92, Promising 0.64, Champions 0.64, "
+        "Loyal 0.49 and Potential Loyalist 0.45. The last two fall below the threshold and "
+        "are flagged for analyst review.",
+}
+
 
 # ── SLIDES 9 & 10 — HOW THE MODEL READ THE BASE ──────────────────────────────
 def chart_slide(title, subtitle, number, panels):
@@ -487,9 +568,12 @@ def chart_slide(title, subtitle, number, panels):
         if not os.path.exists(path):
             continue
         x = 0.45 + i * 6.42
-        s.shapes.add_picture(path, Inches(x), Inches(1.45), width=Inches(6.2))
-        txt(s, caption, x + 0.05, 5.95, 6.1, 0.75, size=9, color=GRAY)
-    txt(s, SYNTHETIC_NOTE, 0.45, 6.92, 12.5, 0.25, size=6.5, italic=True, color=GRAY)
+        pic = s.shapes.add_picture(path, Inches(x), Inches(1.42), width=Inches(6.2))
+        # python-pptx defaults alt text to the file name, so a screen reader would
+        # announce "jev_chart_1_blindspots.png". Describe what the chart shows.
+        pic._element._nvXxPr.cNvPr.set('descr', CHART_ALT.get(path, caption))
+        txt(s, caption, x + 0.05, 5.62, 6.1, 1.1, size=T_CAPTION, color=GRAY)
+    txt(s, SYNTHETIC_NOTE, 0.45, 6.78, 12.5, 0.26, size=T_MICRO, italic=True, color=GRAY)
     return s
 
 
@@ -533,20 +617,23 @@ if os.path.exists(PLAYS_FILE):
 
 
 def plays_to_recs(plays, top_n=4):
-    """Render the top segments by portfolio value as recommendation cards."""
+    """Render the top segments by portfolio value as recommendation cards.
+
+    Three bullets, not four: at projection size a fourth line pushed the card past
+    the half-slide it has. Urgency and confidence share a line, which reads better
+    anyway — how urgent it is and how sure we are belong together.
+    """
     cards = []
     for seg, p in sorted(plays.items(), key=lambda kv: -kv[1]['total_clv'])[:top_n]:
+        certainty = (f"ANALYST REVIEW · confidence {p['confidence']:.2f}"
+                     if p['needs_review'] else
+                     f"confidence {p['confidence']:.2f}")
         bullets = [
             p['deck'],
-            f"{p['count']} customers  ·  ${p['total_clv']:,.0f} CLV  ·  {p['channel']}  ·  cost: {p['cost']}",
-            f"Urgency {p['urgency']:.1f} of {p['urgency_max']}  ·  {p['urgency_label'].split('.')[0]}",
+            f"{p['count']} customers  ·  ${p['total_clv']:,.0f} CLV  ·  {p['channel']}",
+            f"Urgency {p['urgency']:.1f} of {p['urgency_max']}  ·  {certainty}",
         ]
-        bullets.append(
-            f"ANALYST REVIEW — confidence {p['confidence']:.2f}, runner-up was '{p['runner_up']}'"
-            if p['needs_review'] else
-            f"Selected with {p['confidence']:.2f} confidence"
-        )
-        cards.append((f"{p['horizon'].upper()}  ·  {seg.upper()}",
+        cards.append((p['horizon'].upper(), seg.upper(),
                       HORIZON_COLOR.get(p['horizon'], NAVY), p['title'], bullets))
     return cards
 
@@ -593,15 +680,23 @@ recs = [
 if jev_plays:
     recs = plays_to_recs(jev_plays)
 
-for i, (tag, col, title, bullets) in enumerate(recs):
-    x = 0.4  + (i % 2) * 6.3
-    y = 1.25 + (i // 2) * 2.9
-    box(s8, x, y, 6.0, 2.65, fill=LGRAY)
-    box(s8, x, y, 0.08, 2.65, fill=col)
-    txt(s8, tag,   x+0.25, y+0.08, 1.5, 0.3,  size=8,  bold=True, color=col)
-    txt(s8, title, x+0.25, y+0.38, 5.5, 0.35, size=10.5, bold=True, color=DARK)
+# The tag used to be "DEFEND · CHAMPIONS" in a 1.5in box, which wrapped onto the
+# title. Horizon and segment now sit on one wide line, and bullets are pitched to
+# clear two wrapped lines at projection size.
+CARD_W, CARD_H = 6.15, 2.72
+BULLET_PITCH   = 0.56
+
+for i, (horizon, seg_name, col, title, bullets) in enumerate(recs):
+    x = 0.4  + (i % 2) * 6.42
+    y = 1.30 + (i // 2) * 2.95
+    box(s8, x, y, CARD_W, CARD_H, fill=LGRAY)
+    box(s8, x, y, 0.09, CARD_H, fill=col)
+    txt(s8, f'{horizon}  ·  {seg_name}', x+0.28, y+0.09, CARD_W-0.5, 0.3,
+        size=T_LABEL, bold=True, color=col)
+    txt(s8, title, x+0.28, y+0.38, CARD_W-0.5, 0.42, size=T_H2, bold=True, color=DARK)
     for j, b in enumerate(bullets):
-        txt(s8, f'–  {b}', x+0.25, y+0.82+j*0.42, 5.55, 0.38, size=8.5, color=GRAY)
+        txt(s8, f'–  {b}', x+0.28, y+0.88 + j*BULLET_PITCH, CARD_W-0.5, 0.52,
+            size=T_DENSE, color=GRAY)
 
 # ── SLIDE 12 — NEXT STEPS ──────────────────────────────────────────────────────
 s9 = slide()
@@ -635,10 +730,10 @@ for i, (phase, col, items) in enumerate(phases):
     x = 0.4 + i * 4.2
     box(s9, x, 1.25, 3.95, 5.5, fill=LGRAY)
     box(s9, x, 1.25, 3.95, 0.07, fill=col)
-    txt(s9, phase, x+0.2, 1.42, 3.5, 0.6, size=11, bold=True, color=col)
+    txt(s9, phase, x+0.2, 1.42, 3.5, 0.6, size=T_BODY, bold=True, color=col)
     for j, item in enumerate(items):
-        box(s9, x+0.2, 2.2+j*0.88, 0.22, 0.22, fill=col)
-        txt(s9, item, x+0.55, 2.17+j*0.88, 3.2, 0.6, size=9, color=DARK)
+        box(s9, x+0.22, 2.34+j*1.02, 0.20, 0.20, fill=col)
+        txt(s9, item, x+0.58, 2.24+j*1.02, 3.20, 0.92, size=T_DENSE, color=DARK)
 
 # ── SLIDE 13 — APPENDIX / DATA SNAPSHOT ──────────────────────────────────────
 s10 = slide()
@@ -653,7 +748,7 @@ cws2  = [2.3,  0.8,  0.85,  1.05,  1.25,  1.25,  1.35,  3.2]
 
 box(s10, 0.35, 1.2, 12.6, 0.38, fill=NAVY)
 for hdr, cx, cw in zip(hdrs2, cxs2, cws2):
-    txt(s10, hdr, cx+0.05, 1.24, cw, 0.3, size=8, bold=True, color=WHITE)
+    txt(s10, hdr, cx+0.05, 1.24, cw, 0.3, size=T_CAPTION, bold=True, color=WHITE)
 
 for i, seg in enumerate(seg_order):
     d   = seg_summary[seg]
@@ -672,7 +767,7 @@ for i, seg in enumerate(seg_order):
         f"${avg_mon:,.0f}",
     ]
     for v, cx, cw in zip(vals2, cxs2, cws2):
-        txt(s10, v, cx+0.05, y+0.12, cw-0.1, 0.28, size=8.5, color=DARK)
+        txt(s10, v, cx+0.05, y+0.12, cw-0.1, 0.28, size=T_DENSE, color=DARK)
 
 # ── SLIDE 14 — HOW THIS WAS BUILT ────────────────────────────────────────────
 if blind_spots:
@@ -684,63 +779,63 @@ if blind_spots:
 
     low_conf = [s for s, p in jev_plays.items() if p['needs_review']] if jev_plays else []
 
+    # Trimmed for projection. The previous copy ran to 200-character bullets, which
+    # at 14pt in a 3.65in column is six wrapped lines — the columns overflowed their
+    # own boxes and collided with the strip beneath.
     columns = [
         ('WHAT WE ASKED', BLUE,
-         'Five plain questions about each\ncustomer\'s most recent message', [
+         'Five plain questions about\neach customer message', [
             'Are they signalling they want to leave?',
-            'How serious is the problem they describe?',
-            'What is driving it — service, price, the product, a competitor, '
-            'or something on their side?',
-            'Could we still keep them if we acted this fortnight?',
-            'Does this need a person, or will a campaign do?',
-            'Answers come back as numbers, not paragraphs, so ordinary code can '
-            'use them directly.',
+            'How serious is the problem?',
+            'What is driving it — service, price, the product, a competitor?',
+            'Could we still keep them if we acted now?',
+            'Does this need a person, or a campaign?',
+            'Answers come back as numbers, so ordinary code can use them.',
          ]),
         ('WHY NOT A TRAINED MODEL', RED,
-         'The usual approach did not fit\nthe problem we actually had', [
-            'A trained classifier learns from examples. It needs thousands of past '
-            'messages, each labelled by hand by someone who already knew the answer. '
+         'The usual approach did not fit\nthe problem we had', [
+            'A trained classifier learns from examples. It needs thousands of '
+            'messages, each labelled by hand.',
             'We have 100 customers and no labels at all.',
-            'Every new question would mean another labelled set and another training '
-            'run. Here, adding a question took minutes.',
-            'Our first scoring rule was wrong — it treated a furious customer as safe. '
-            'Fixing it cost nothing, because the answers were already saved and we '
-            'simply re-scored them. Retraining a model would have meant starting again.',
+            'Every new question would mean another labelled set and another '
+            'training run. Here it took minutes.',
+            'Our first scoring rule was wrong. Fixing it cost nothing, because '
+            'the answers were already saved.',
          ]),
         ('WHAT STAYED ORDINARY CODE', GREEN,
          'The model never touches\na single calculation', [
-            'Every number is plain arithmetic: the RFM scores, lifetime value, the '
-            'thresholds, the weights, who makes the list.',
-            'The model judges meaning. Code owns every calculation and every decision '
-            'that follows from it.',
-            'This is the step before machine learning, not a replacement for it. Once '
-            'enough of these judgments are paired with real outcomes, they become '
+            'Every number is plain arithmetic: the scores, the lifetime value, '
+            'the thresholds, the weights.',
+            'The model reads meaning. Code owns every calculation that follows.',
+            'This is the step before machine learning, not a replacement for it.',
+            'Pair enough of these judgments with real outcomes and they become '
             'inputs to a conventional model.',
          ]),
     ]
 
     for i, (tag, col, strap, points) in enumerate(columns):
         x = 0.4 + i * 4.32
-        box(s12, x, 1.25, 4.05, 4.55, fill=LGRAY)
-        box(s12, x, 1.25, 4.05, 0.07, fill=col)
-        txt(s12, tag, x + 0.22, 1.42, 3.7, 0.25, size=8, bold=True, color=col)
-        txt(s12, strap, x + 0.22, 1.70, 3.7, 0.6, size=10, bold=True, color=DARK)
+        box(s12, x, 1.25, 4.05, 4.95, fill=LGRAY)
+        box(s12, x, 1.25, 4.05, 0.08, fill=col)
+        txt(s12, tag, x + 0.22, 1.42, 3.7, 0.25, size=T_CAPTION, bold=True, color=col)
+        txt(s12, strap, x + 0.22, 1.74, 3.7, 0.95, size=T_BODY, bold=True, color=DARK)
 
-        y = 2.42
+        CHARS_PER_LINE = 39          # 3.65in column at T_CAPTION
+        LINE_H         = 0.235       # T_CAPTION line height in inches
+        y = 2.82
         for point in points:
-            txt(s12, '–  ' + point, x + 0.22, y, 3.65, 0.9, size=8, color=GRAY)
-            y += 0.24 + 0.135 * max(1, (len(point) // 52) + 1)
+            lines = max(1, -(-len(point) // CHARS_PER_LINE))
+            txt(s12, '–  ' + point, x + 0.22, y, 3.65, lines * LINE_H + 0.1,
+                size=T_CAPTION, color=GRAY)
+            y += lines * LINE_H + 0.20
 
-    box(s12, 0.4, 5.95, 12.5, 0.9, fill=RGBColor(0xED, 0xF3, 0xFA))
-    txt(s12, 'The model reports how sure it is.', 0.6, 6.05, 3.0, 0.28,
-        size=9.5, bold=True, color=NAVY)
-    txt(s12, f'{len(low_conf)} of {len(jev_plays) if jev_plays else 0} recommended plays came back below our '
-             f'confidence bar. Those are marked for analyst review rather than presented as settled. '
-             f'A model that says "I am not sure" is more useful than one that guesses confidently — '
-             f'and it is the difference between a slide you can defend and one you cannot.',
-        0.6, 6.30, 12.1, 0.5, size=9, color=NAVY)
+    box(s12, 0.4, 6.34, 12.5, 0.62, fill=RGBColor(0xED, 0xF3, 0xFA))
+    txt(s12, f'The model reports how sure it is — {len(low_conf)} of '
+             f'{len(jev_plays) if jev_plays else 0} plays fell below our confidence bar '
+             f'and are flagged for review.',
+        0.6, 6.48, 12.1, 0.36, size=T_DENSE, bold=True, color=NAVY)
 
-    txt(s12, SYNTHETIC_NOTE, 0.4, 6.92, 12.5, 0.25, size=6.5, italic=True, color=GRAY)
+    txt(s12, SYNTHETIC_NOTE, 0.4, 6.82, 12.5, 0.28, size=T_MICRO, italic=True, color=GRAY)
 
 # ── SAVE ──────────────────────────────────────────────────────────────────────
 out = 'RFM_Customer_Analysis.pptx'

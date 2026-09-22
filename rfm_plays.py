@@ -41,7 +41,7 @@ CONFIDENCE_FLOOR = 0.50
 PLAYS = {
     'vip_programme': {
         'title':   'Formalise a VIP tier',
-        'deck':    "Dedicated contact, early access, exclusive pricing tier",
+        'deck':    "Dedicated contact, early access, exclusive pricing",
         'what':    "Dedicated contact, early access to new range, exclusive pricing tier, "
                    "minimum quarterly touchpoint.",
         'best_for': "A healthy, high-value group that is still buying happily. The default for segments with strong recency, strong frequency and no complaint on record.",
@@ -50,7 +50,7 @@ PLAYS = {
     },
     'service_recovery': {
         'title':   'Run a service recovery',
-        'deck':    "Name the failure, fix it, compensate, manager closes the loop",
+        'deck':    "Name the failure, fix it, compensate, close the loop",
         'what':    "Acknowledge the failure by name, fix it, compensate, and have a manager "
                    "close the loop personally.",
         'best_for': "A group whose dominant theme is service — unresolved tickets, repeated chasing, fulfilment errors. Use whenever service is the leading driver, regardless of how healthy their purchase history looks.",
@@ -86,7 +86,7 @@ PLAYS = {
     },
     'loyalty_onboarding': {
         'title':   'Onboard into the loyalty programme',
-        'deck':    "Structured nurture sequence into the loyalty programme",
+        'deck':    "Structured nurture into the loyalty programme",
         'what':    "Structured nurture sequence that builds a buying habit and enrols them "
                    "into the loyalty scheme.",
         'best_for': "Recent buyers with two or three purchases — the habit is forming but not set.",
@@ -112,7 +112,7 @@ PLAYS = {
     },
     'winback_offer': {
         'title':   'Time-boxed win-back',
-        'deck':    "Expiring reactivation offer, with a measured control group",
+        'deck':    "Expiring reactivation offer, with a control group",
         'what':    "A concrete, expiring reactivation offer with a defined window and a "
                    "measured control group.",
         'best_for': "Lapsed groups that are still plausibly reachable — gone quiet, but not gone for good, and still worth a concrete offer.",
