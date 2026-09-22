@@ -267,6 +267,29 @@ urgency and reversibility, and writes `rfm_plays.json`. Picks below
 `build_pptx.py` reads that file when present and falls back to the built-in
 recommendations when it is absent, so the deck always builds.
 
+### `jev_dashboard.py` — visualising what the model did
+
+```bash
+python jev_dashboard.py
+```
+
+Four charts, each answering one question:
+
+| Chart | Question |
+|---|---|
+| `jev_chart_1_blindspots.png` | Who did the language flag that the numbers did not? |
+| `jev_chart_2_intent_vs_severity.png` | Is "angry" the same as "leaving"? |
+| `jev_chart_3_drivers.png` | What is driving dissatisfaction? |
+| `jev_chart_4_confidence.png` | How sure was the model about each recommendation? |
+
+The second is the one worth looking at twice. An unresolved failure scores near the
+top on severity and near the bottom on intent to leave — those customers are
+complaining *to* you, not walking away. Collapsing the two into a single "risk"
+number hides both, which is exactly the bug this chart caught.
+
+Palette is a three-colour Okabe-Ito subset, validated for colour-vision deficiency
+and contrast. Every series is direct-labelled as well as coloured.
+
 ### `rfm_audit.py` — does the code match the docs?
 
 ```bash
@@ -288,6 +311,7 @@ python rfm_analysis.py     # scores, segments, CLV
 python make_verbatims.py   # synthetic customer text
 python rfm_signals.py      # churn signals + composite priority
 python rfm_plays.py        # per-segment play selection
+python jev_dashboard.py    # charts showing how the model scored
 python build_pptx.py       # deck, now reading the selected plays
 python rfm_audit.py        # verification
 ```
